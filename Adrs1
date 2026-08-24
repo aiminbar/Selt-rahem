@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مغامرة صلة الرحم | ai.minbar</title>
+<style>
+:root{--navy:#24364b;--sky:#bfe8f7;--pink:#f7c6d5;--cream:#fffaf0;--mint:#dff3df;--lav:#e9def8;--yellow:#ffe8a6;--red:#f3a6a6}
+*{box-sizing:border-box} body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(160deg,#fffaf0,#eef9ff);color:var(--navy)}
+.wrap{max-width:920px;margin:auto;padding:18px}.card{background:#fff;border:3px solid #fff;box-shadow:0 12px 35px #24364b18;border-radius:28px;padding:22px;margin:14px 0}
+h1,h2,h3{margin:6px 0 12px}.muted{opacity:.75}.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.badge{background:var(--sky);padding:9px 14px;border-radius:999px;font-weight:bold}.stars{font-size:22px}
+.progress{height:14px;background:#e8edf2;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,#a9dff3,#f5c4d3);transition:.35s}
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stage{border:0;border-radius:22px;padding:18px 10px;background:#f6f7f9;color:var(--navy);font-weight:bold;font-size:16px;cursor:pointer;min-height:100px}.stage.open{background:var(--cream);outline:3px solid var(--sky)}.stage.done{background:var(--mint)}.stage:disabled{opacity:.45;cursor:not-allowed}
+.screen{display:none}.screen.active{display:block}.q{font-size:21px;font-weight:bold;margin:16px 0}.opts{display:grid;gap:10px}.opt,.action{border:0;border-radius:18px;padding:14px;font-size:17px;cursor:pointer;background:#eef6fb;color:var(--navy)}.opt:hover,.action:hover{transform:translateY(-1px)}.good{background:#dff3df!important}.bad{background:#ffdede!important}
+.action{background:var(--navy);color:#fff;padding:12px 20px}.secondary{background:#e9def8;color:var(--navy)}.feedback{min-height:38px;font-weight:bold;font-size:17px;margin-top:12px}
+.mascot{width:105px;height:105px;background:#fff3d8;border:4px solid var(--navy);border-radius:42% 42% 48% 48%;position:relative;margin:6px auto 12px;clip-path:polygon(18% 12%,42% 4%,58% 15%,78% 7%,94% 31%,87% 83%,50% 98%,13% 83%,6% 31%)}
+.eye{position:absolute;top:42px;width:9px;height:13px;background:var(--navy);border-radius:50%}.e1{right:31px}.e2{left:31px}.cheek{position:absolute;top:61px;width:18px;height:9px;background:#f5a9b8;border-radius:50%}.c1{right:18px}.c2{left:18px}.scarf{position:absolute;bottom:-3px;left:22px;width:62px;height:24px;background:#a9dff3;border:3px solid var(--navy);border-radius:13px}
+.nodes{position:absolute;top:-16px;left:20px;right:20px;height:20px}.nodes:before,.nodes:after{content:"";position:absolute;width:8px;height:8px;background:var(--navy);border-radius:50%;top:0}.nodes:before{left:5px}.nodes:after{right:5px}
+.sort{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bucket{min-height:150px;padding:14px;border:3px dashed #b7c9d8;border-radius:20px;background:#fbfdff}.chip{display:inline-block;padding:10px 13px;background:var(--yellow);border-radius:15px;margin:5px;cursor:pointer;font-weight:bold}
+.words{padding:10px;text-align:center}.sentence{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px}.slot{min-width:90px;min-height:45px;border:2px dashed #9db3c3;border-radius:13px;padding:9px}
+.cert{text-align:center;background:linear-gradient(145deg,#fff,#fff7dc);border:5px double #a9dff3;padding:28px;border-radius:28px}.big{font-size:46px}
+@media(max-width:650px){.map{grid-template-columns:1fr 1fr}.sort{grid-template-columns:1fr}.q{font-size:18px}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="card">
+ <div class="top"><div><b>ai.minbar</b><div class="muted">مغامرة تعليمية - لغتي - ثاني ابتدائي</div></div><div class="badge">⭐ <span id="score">0</span> نقطة</div></div>
+ <div class="progress"><div class="bar" id="bar"></div></div>
+</div>
+
+<section id="home" class="screen active">
+<div class="card" style="text-align:center">
+ <div class="mascot"><div class="nodes"></div><i class="eye e1"></i><i class="eye e2"></i><i class="cheek c1"></i><i class="cheek c2"></i><div class="scarf"></div></div>
+ <h1>مغامرة صلة الرحم</h1>
+ <p>اجتزي 6 مراحل، واجمعي النجوم حتى تصلي إلى وسام <b>سفير صلة الرحم</b>.</p>
+ <button class="action" onclick="showMap()">ابدئي المغامرة 🚀</button>
+</div></section>
+
+<section id="map" class="screen"><div class="card"><h2>خريطة المغامرة</h2><p class="muted">كل مرحلة تفتح المرحلة التي بعدها.</p><div class="map" id="mapGrid"></div></div></section>
+<section id="play" class="screen"><div class="card"><div id="content"></div><div class="feedback" id="fb"></div><button id="back" class="action secondary" onclick="showMap()">خريطة المراحل</button></div></section>
+<section id="finish" class="screen"><div class="card cert"><div class="big">🏆</div><h1>أحسنتِ!</h1><h2>وسام سفير صلة الرحم</h2><p>أكملتِ مغامرة صلة الرحم وطبقتِ مهارات القراءة والمفردات والتراكيب والتعبير.</p><h3>مجموعك: <span id="finalScore"></span> نقطة ⭐</h3><button class="action" onclick="restart()">إعادة المغامرة</button></div></section>
+</div>
+<script>
+const stages=[
+ {title:"1. بوابة الفهم 📖",skill:"الفهم والاستيعاب",type:"quiz",qs:[
+  ["ما معنى صلة الرحم؟",["زيارة الأقارب والسؤال عنهم","اللعب وحدي","شراء لعبة"],0],
+  ["أي تصرف يدل على صلة الرحم؟",["أتجاهل قريبي","أزور قريبي وأطمئن عليه","أرفض مساعدته"],1],
+  ["عندما يحتاج أحد أقاربي للمساعدة فإنني...",["أساعده","أبتعد عنه","أسخر منه"],0]
+ ]},
+ {title:"2. صيد المفردات 🎯",skill:"المفردات",type:"quiz",qs:[
+  ["اختاري الأقرب لمعنى «أتفقد أحوالهم»:",["أسأل عنهم وأطمئن عليهم","أنساهم","أخاصمهم"],0],
+  ["اختاري الكلمة التي تدل على الأقارب:",["أقاربي","كتابي","ملعبي"],0],
+  ["أي كلمة تناسب جملة: أشارك أقاربي ____؟",["أفراحهم","أبوابهم","أقلامهم"],0]
+ ]},
+ {title:"3. مختبر التراكيب 🧪",skill:"التراكيب اللغوية",type:"order"},
+ {title:"4. مهمة الدعاء 🤲",skill:"محاكاة أسلوب الدعاء",type:"dua"},
+ {title:"5. مواقف الأقارب 💌",skill:"التطبيق السلوكي",type:"quiz",qs:[
+  ["قريبتك مريضة. ماذا تفعلين؟",["أطمئن عليها وأدعو لها","لا أهتم","أزعجها"],0],
+  ["نجح قريبك في المدرسة. ماذا تفعلين؟",["أهنئه وأفرح له","أغضب منه","أتجاهله"],0],
+  ["احتاج قريبك مساعدة بسيطة.",["أساعده بما أستطيع","أرفض دائمًا","أضحك عليه"],0]
+ ]},
+ {title:"6. التحدي النهائي 👑",skill:"دمج المهارات",type:"final",qs:[
+  ["صلة الرحم تكون مع...",["الأقارب","الألعاب","الأثاث"],0],
+  ["«اللهم احفظ أمي» مثال على...",["الدعاء","السؤال","النهي"],0],
+  ["أكمل: أزور أقاربي و____ عنهم.",["أسأل","أهرب","أغلق"],0],
+  ["التصرف الأفضل عند فرح قريب هو...",["مشاركته فرحته","تجاهله","مخاصمته"],0]
+ ]}
+];
+let unlocked=1,done=Array(6).fill(false),score=0,current=0,qIndex=0,stageEarn=0;
+function screens(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function showMap(){screens("map");renderMap()}
+function renderMap(){let g=document.getElementById("mapGrid");g.innerHTML="";stages.forEach((s,i)=>{let b=document.createElement("button");b.className="stage "+(done[i]?"done":(i<unlocked?"open":""));b.disabled=i>=unlocked&&!done[i];b.innerHTML=s.title+"<br><small>"+s.skill+"</small>"+(done[i]?"<br>✅ مكتملة":"");b.onclick=()=>start(i);g.appendChild(b)});document.getElementById("bar").style.width=(done.filter(Boolean).length/6*100)+"%"}
+function start(i){current=i;qIndex=0;stageEarn=0;screens("play");document.getElementById("fb").textContent="";renderStage()}
+function renderStage(){let s=stages[current],c=document.getElementById("content");if(s.type==="quiz"||s.type==="final"){renderQuiz()}else if(s.type==="order"){c.innerHTML=`<h2>${s.title}</h2><p>رتبي الكلمات لتكوين جملة صحيحة:</p><div class="words" id="bank"></div><div class="sentence" id="sent"></div><button class="action" onclick="checkOrder()">تحقق</button>`;["أزور","أقاربي","وأسأل","عنهم"].sort(()=>Math.random()-.5).forEach(w=>{let x=document.createElement("span");x.className="chip";x.textContent=w;x.onclick=()=>moveWord(x);document.getElementById("bank").appendChild(x)})}
+else if(s.type==="dua"){c.innerHTML=`<h2>${s.title}</h2><p class="q">أكملي الدعاء على نمط: «اللهم احفظ أمي»</p><div class="opts"><button class="opt" onclick="dua(this,true)">اللهم احفظ أبي</button><button class="opt" onclick="dua(this,false)">أبي في البيت</button><button class="opt" onclick="dua(this,false)">هل رأيت أبي؟</button></div>`}}
+function renderQuiz(){let s=stages[current],item=s.qs[qIndex],c=document.getElementById("content");c.innerHTML=`<h2>${s.title}</h2><div class="badge">المهارة: ${s.skill}</div><div class="q">${item[0]}</div><div class="opts">${item[1].map((o,i)=>`<button class="opt" onclick="answer(this,${i},${item[2]})">${o}</button>`).join("")}</div><p class="muted">السؤال ${qIndex+1} من ${s.qs.length}</p>`}
+function answer(btn,i,correct){document.querySelectorAll(".opt").forEach(b=>b.disabled=true);if(i===correct){btn.classList.add("good");gain(10);fb("إجابة رائعة! ⭐")}else{btn.classList.add("bad");document.querySelectorAll(".opt")[correct].classList.add("good");fb("قريبة! شاهدي الإجابة الصحيحة ثم نكمل.")}setTimeout(()=>{qIndex++;if(qIndex>=stages[current].qs.length)complete();else renderQuiz()},900)}
+function moveWord(x){let bank=document.getElementById("bank"),sent=document.getElementById("sent");(x.parentElement===bank?sent:bank).appendChild(x)}
+function checkOrder(){let arr=[...document.querySelectorAll("#sent .chip")].map(x=>x.textContent).join(" ");if(arr==="أزور أقاربي وأسأل عنهم"){gain(30);fb("ممتاز! رتبتِ الجملة بشكل صحيح ⭐⭐⭐");setTimeout(complete,900)}else fb("حاولي مرة أخرى: ابدئي بالفعل «أزور».")}
+function dua(btn,ok){document.querySelectorAll(".opt").forEach(b=>b.disabled=true);if(ok){btn.classList.add("good");gain(30);fb("صحيح! حافظتِ على أسلوب الدعاء 👏")}else{btn.classList.add("bad");document.querySelectorAll(".opt")[0].classList.add("good");fb("نبحث عن جملة تبدأ بـ «اللهم».")}setTimeout(complete,1000)}
+function gain(n){score+=n;stageEarn+=n;document.getElementById("score").textContent=score}
+function fb(t){document.getElementById("fb").textContent=t}
+function complete(){done[current]=true;unlocked=Math.max(unlocked,current+2);if(current===5){document.getElementById("finalScore").textContent=score;screens("finish")}else{fb("🎉 اجتزتِ المرحلة! فُتحت المرحلة التالية.");setTimeout(showMap,1000)}}
+function restart(){unlocked=1;done=Array(6).fill(false);score=0;document.getElementById("score").textContent=0;showMap()}
+</script></body></html>
