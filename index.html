@@ -3,267 +3,197 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>صلة الرحم — ضبط التزامن</title>
+<title>صِلَةُ الرَّحِمِ — القراءة المتزامنة</title>
 <style>
+:root {
+  --navy:#18254f;
+  --cream:#fffdf7;
+  --lav:#ddd7ff;
+  --lav2:#f3efff;
+  --pink:#ff86b5;
+  --blue:#70c9f4;
+  --red:#ef3d4f;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#f7f4fb;color:#1c2941;font-family:"Geeza Pro","Tahoma",sans-serif;padding:14px}
-.wrap{max-width:1250px;margin:auto}
-h1{margin:0 0 8px;font-size:30px}
-.note{color:#5d6472;margin-bottom:12px}
-.panel{background:#fffdf8;border:3px solid #ded2ee;border-radius:26px;padding:24px;box-shadow:0 12px 30px rgba(30,30,60,.09)}
-.text{font-size:clamp(21px,2.2vw,33px);line-height:2.05;font-weight:700;text-align:right}
-.blankline{height:.5em}
-.word{display:inline-block;position:relative;padding:0 .02em .08em;white-space:nowrap}
-.word.active{background:#fff0f1}
-.word.active:after{content:"";position:absolute;right:4%;left:4%;bottom:.01em;height:4px;background:#d91f32;border-radius:9px}
-.word.target{outline:2px dashed #8e69bf;outline-offset:4px;border-radius:7px}
-.controls{position:sticky;bottom:8px;margin-top:14px;background:rgba(255,255,255,.97);border:1px solid #e4ddeb;border-radius:22px;padding:12px;box-shadow:0 8px 28px rgba(30,30,60,.15)}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-button{border:0;border-radius:14px;padding:11px 15px;font-size:16px;font-weight:700;background:#e9def6;color:#1c2941}
-.primary{background:#cfeaf8} .sync{background:#ffdfe2} .good{background:#dff3e7}
-#tapBtn{font-size:20px;padding:16px 22px;min-width:220px}
-input[type=range]{flex:1;min-width:220px}
-.bigword{font-size:24px;font-weight:800;padding:8px 12px;border-radius:12px;background:#fff5d8;min-width:150px;text-align:center}
-.small{font-size:14px;color:#687083}
-textarea{width:100%;height:85px;margin-top:10px;border:1px solid #ddd;border-radius:12px;padding:10px;direction:ltr;font-size:12px}
-.hidden{display:none}
-@media(max-width:700px){.panel{padding:16px 12px}.text{font-size:21px}#tapBtn{width:100%}}
+html,body{margin:0;min-height:100%;background:#f7f5ff;color:var(--navy);font-family:"Tahoma","Arial","Noto Naskh Arabic","Geeza Pro",sans-serif}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 12% 8%,#ffeaf3 0 15%,transparent 32%),
+    radial-gradient(circle at 90% 14%,#e8f7ff 0 14%,transparent 30%),
+    linear-gradient(180deg,#f8f6ff,#fffaf6);
+}
+.app{
+  width:min(1500px,100%);
+  margin:auto;
+  min-height:100vh;
+  padding:10px 14px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.banner{
+  position:relative;
+  width:100%;
+  aspect-ratio:2048/624;
+  max-height:22vh;
+  min-height:118px;
+  border-radius:24px;
+  overflow:hidden;
+  flex:0 0 auto;
+}
+.banner img{width:100%;height:100%;object-fit:cover;display:block}
+.hotspot{
+  position:absolute;
+  top:44%;
+  width:6.2%;
+  aspect-ratio:1;
+  border:0;background:transparent;
+  cursor:pointer;border-radius:50%;
+  transform:translateY(-50%);
+  -webkit-tap-highlight-color:transparent;
+}
+.hotspot:focus-visible{outline:4px solid #fff;box-shadow:0 0 0 7px #6757d9}
+#playBtn{left:65.1%}
+#pauseBtn{left:73.2%}
+#restartBtn{left:81.3%}
 
-.editor{margin-top:12px;background:#fff;border:2px solid #d9cbea;border-radius:20px;padding:14px}
-.editorTitle{font-weight:800;font-size:18px;margin-bottom:8px}
-.wordNav{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;align-items:center;margin:10px 0}
-.wordBox{padding:10px;border-radius:12px;background:#f6f2fa;text-align:center}
-.wordBox.current{background:#fff0d2;font-size:22px;font-weight:900}
-.adjust{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.adjust button{min-width:88px}
-.indexLabel{text-align:center;font-weight:700;margin:6px}
-
+.reader{
+  flex:1 1 auto;
+  min-height:0;
+  background:rgba(255,253,247,.97);
+  border:3px solid #d9d2ff;
+  border-radius:28px;
+  box-shadow:0 10px 30px rgba(71,61,130,.10);
+  padding:clamp(14px,1.8vw,28px) clamp(18px,2.5vw,40px);
+  overflow:auto;
+  scrollbar-width:thin;
+}
+.text{
+  max-width:1350px;
+  margin:auto;
+  font-size:clamp(21px,2.15vw,35px);
+  line-height:1.95;
+  font-weight:600;
+  text-align:right;
+}
+.text p{margin:.08em 0 .36em}
+.spacer{height:.15em}
+.word{
+  display:inline;
+  position:relative;
+  white-space:nowrap;
+  padding-bottom:.08em;
+}
+.word.active::after{
+  content:"";
+  position:absolute;
+  right:0;left:0;
+  bottom:-.03em;
+  height:4px;
+  border-radius:99px;
+  background:var(--red);
+  box-shadow:0 1px 0 rgba(255,255,255,.8);
+}
+.status{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  direction:ltr;
+  padding:0 8px;
+}
+.track{height:8px;background:#e8e5f3;border-radius:999px;overflow:hidden;flex:1}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#ff8eb9,#8ecdf2);border-radius:999px}
+.time{font:700 14px/1 Arial;color:#4a4a62;min-width:108px;text-align:center}
+.audio{display:none}
+@media (max-width:800px){
+  .app{padding:6px 7px 10px;gap:7px}
+  .banner{border-radius:16px;max-height:19vh;min-height:90px}
+  .reader{border-radius:20px;padding:12px 14px}
+  .text{font-size:clamp(18px,3.6vw,27px);line-height:1.85}
+  .word.active::after{height:3px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-<h1>صِلَةُ الرَّحِمِ</h1>
-<div class="note">نسخة الاختبار بالتوقيت الذي ضبطتِه يدويًا مع الصوت.</div>
-<div class="panel"><div id="readingText" class="text"><div class="line"><span class="word" data-i="0">عِنْدَ</span> <span class="word" data-i="1">عَوْدَةِ</span> <span class="word" data-i="2">فَوَّازٍ</span> <span class="word" data-i="3">وَنُورَةَ</span> <span class="word" data-i="4">مِنَ</span> <span class="word" data-i="5">الْمَدْرَسَةِ</span> <span class="word" data-i="6">بِصُحْبَةِ</span> <span class="word" data-i="7">أَبِيهِمَا،</span> <span class="word" data-i="8">اسْتَمَعُوا</span> <span class="word" data-i="9">إِلَى</span> <span class="word" data-i="10">مُذِيعٍ</span> <span class="word" data-i="11">يَقْرَأُ</span> <span class="word" data-i="12">فِي</span> <span class="word" data-i="13">الْإِذَاعَةِ</span> <span class="word" data-i="14">قَوْلَ</span> <span class="word" data-i="15">الرَّسُولِ</span> <span class="word" data-i="16">-صَلَّى</span> <span class="word" data-i="17">اللهُ</span> <span class="word" data-i="18">عَلَيْهِ</span> <span class="word" data-i="19">وَسَلَّمَ-:</span> <span class="word" data-i="20">«مَنْ</span> <span class="word" data-i="21">كَانَ</span> <span class="word" data-i="22">يُؤْمِنُ</span> <span class="word" data-i="23">بِاللهِ</span> <span class="word" data-i="24">وَالْيَوْمِ</span> <span class="word" data-i="25">الْآخِرِ</span> <span class="word" data-i="26">فَلْيَصِلْ</span> <span class="word" data-i="27">رَحِمَهُ»</span></div><div class="line"><span class="word" data-i="28">سَأَلَ</span> <span class="word" data-i="29">فَوَّازٌ</span> <span class="word" data-i="30">أَبَاهُ:</span> <span class="word" data-i="31">مَا</span> <span class="word" data-i="32">مَعْنَى</span> <span class="word" data-i="33">الرَّحِمِ</span> <span class="word" data-i="34">يَا</span> <span class="word" data-i="35">أَبِي؟</span></div><div class="line"><span class="word" data-i="36">الْأَبُ:</span> <span class="word" data-i="37">الرَّحِمُ</span> <span class="word" data-i="38">اسْمٌ</span> <span class="word" data-i="39">لِكُلِّ</span> <span class="word" data-i="40">مَنْ</span> <span class="word" data-i="41">تَرْبِطُنَا</span> <span class="word" data-i="42">بِهِمْ</span> <span class="word" data-i="43">صِلَةُ</span> <span class="word" data-i="44">قُرْبَى.</span></div><div class="line"><span class="word" data-i="45">نُورَةُ:</span> <span class="word" data-i="46">وَمَا</span> <span class="word" data-i="47">مَعْنَى</span> <span class="word" data-i="48">صِلَةِ</span> <span class="word" data-i="49">الرَّحِمِ؟</span></div><div class="line"><span class="word" data-i="50">الْأَبُ:</span> <span class="word" data-i="51">صِلَةُ</span> <span class="word" data-i="52">الرَّحِمِ</span> <span class="word" data-i="53">تَعْنِي</span> <span class="word" data-i="54">زِيَارَةَ</span> <span class="word" data-i="55">الْأَقَارِبِ،</span> <span class="word" data-i="56">وَالسُّؤَالَ</span> <span class="word" data-i="57">عَنْهُمْ،</span> <span class="word" data-i="58">وَتَفَقُّدَ</span> <span class="word" data-i="59">أَحْوَالِهِمْ،</span> <span class="word" data-i="60">وَمُسَاعَدَتَهُمْ</span> <span class="word" data-i="61">عِنْدَ</span> <span class="word" data-i="62">الْحَاجَةِ،</span> <span class="word" data-i="63">وَمُشَارَكَتَهُمْ</span> <span class="word" data-i="64">أَفْرَاحَهُمْ</span> <span class="word" data-i="65">وَأَحْزَانَهُمْ</span></div><div class="line"><span class="word" data-i="66">فَوَّازٌ:</span> <span class="word" data-i="67">مَا</span> <span class="word" data-i="68">رَأْيُكَ</span> <span class="word" data-i="69">يَا</span> <span class="word" data-i="70">أَبِي</span> <span class="word" data-i="71">أَنْ</span> <span class="word" data-i="72">نُخَصِّصَ</span> <span class="word" data-i="73">يَوْمًا</span> <span class="word" data-i="74">نَصِلُ</span> <span class="word" data-i="75">فِيهِ</span> <span class="word" data-i="76">أَرْحَامَنَا؟</span></div><div class="blankline"></div><div class="line"><span class="word" data-i="77">الْأَبُ:</span> <span class="word" data-i="78">إِنَّهُ</span> <span class="word" data-i="79">رَأْيٌ</span> <span class="word" data-i="80">جَمِيلٌ،</span> <span class="word" data-i="81">بَارَكَ</span> <span class="word" data-i="82">اللهُ</span> <span class="word" data-i="83">فِيكَ</span> <span class="word" data-i="84">يَا</span> <span class="word" data-i="85">بُنَيَّ</span></div><div class="blankline"></div><div class="line"><span class="word" data-i="86">نُورَةُ:</span> <span class="word" data-i="87">أَنَا</span> <span class="word" data-i="88">مُتَشَوِّقَةٌ</span> <span class="word" data-i="89">لِهَذَا</span> <span class="word" data-i="90">الْيَوْمِ</span> <span class="word" data-i="91">يَا</span> <span class="word" data-i="92">أَبِي.</span></div><div class="blankline"></div><div class="line"><span class="word" data-i="93">الْأَبُ:</span> <span class="word" data-i="94">بَارَكَ</span> <span class="word" data-i="95">اللهُ</span> <span class="word" data-i="96">فِيكِ</span> <span class="word" data-i="97">يَا</span> <span class="word" data-i="98">بُنَيَّتِي</span></div></div></div>
+<main class="app">
+  <section class="banner" aria-label="شريط الدرس">
+    <img src="banner.png" alt="">
+    <button class="hotspot" id="playBtn" aria-label="تشغيل"></button>
+    <button class="hotspot" id="pauseBtn" aria-label="إيقاف مؤقت"></button>
+    <button class="hotspot" id="restartBtn" aria-label="إعادة من البداية"></button>
+  </section>
 
-<div class="controls">
-  <div class="row">
-    <button class="primary" id="playBtn">▶ تشغيل</button>
-    <button id="restartBtn">↺ من البداية</button>
-    <button class="sync" id="calBtn">🎯 بدء ضبط التزامن</button>
-    <span id="status" class="small">التوقيت الحالي: مبدئي</span>
-  </div>
-
-  <div id="calArea" class="hidden" style="margin-top:10px">
-    <div class="row">
-      <div>الكلمة التالية:</div>
-      <div id="targetWord" class="bigword">—</div>
-      <button id="tapBtn" class="good">اضغطي عند نطق الكلمة</button>
-      <button id="undoBtn">↶ تراجع كلمة</button>
-      <button id="finishBtn">✓ إنهاء وحفظ</button>
+  <section class="reader" id="reader">
+    <div class="text" id="text">
+      <p><span class="word" data-i="0">عِنْدَ</span> <span class="word" data-i="1">عَوْدَةِ</span> <span class="word" data-i="2">فَوَّازٍ</span> <span class="word" data-i="3">وَنُورَةَ</span> <span class="word" data-i="4">مِنَ</span> <span class="word" data-i="5">الْمَدْرَسَةِ</span> <span class="word" data-i="6">بِصُحْبَةِ</span> <span class="word" data-i="7">أَبِيهِمَا،</span> <span class="word" data-i="8">اسْتَمَعُوا</span> <span class="word" data-i="9">إِلَى</span> <span class="word" data-i="10">مُذِيعٍ</span> <span class="word" data-i="11">يَقْرَأُ</span> <span class="word" data-i="12">فِي</span> <span class="word" data-i="13">الْإِذَاعَةِ</span> <span class="word" data-i="14">قَوْلَ</span> <span class="word" data-i="15">الرَّسُولِ</span> <span class="word" data-i="16">-صَلَّى</span> <span class="word" data-i="17">اللهُ</span> <span class="word" data-i="18">عَلَيْهِ</span> <span class="word" data-i="19">وَسَلَّمَ-:</span> <span class="word" data-i="20">«مَنْ</span> <span class="word" data-i="21">كَانَ</span> <span class="word" data-i="22">يُؤْمِنُ</span> <span class="word" data-i="23">بِاللهِ</span> <span class="word" data-i="24">وَالْيَوْمِ</span> <span class="word" data-i="25">الْآخِرِ</span> <span class="word" data-i="26">فَلْيَصِلْ</span> <span class="word" data-i="27">رَحِمَهُ»</span></p><p><span class="word" data-i="28">سَأَلَ</span> <span class="word" data-i="29">فَوَّازٌ</span> <span class="word" data-i="30">أَبَاهُ:</span> <span class="word" data-i="31">مَا</span> <span class="word" data-i="32">مَعْنَى</span> <span class="word" data-i="33">الرَّحِمِ</span> <span class="word" data-i="34">يَا</span> <span class="word" data-i="35">أَبِي؟</span></p><p><span class="word" data-i="36">الْأَبُ:</span> <span class="word" data-i="37">الرَّحِمُ</span> <span class="word" data-i="38">اسْمٌ</span> <span class="word" data-i="39">لِكُلِّ</span> <span class="word" data-i="40">مَنْ</span> <span class="word" data-i="41">تَرْبِطُنَا</span> <span class="word" data-i="42">بِهِمْ</span> <span class="word" data-i="43">صِلَةُ</span> <span class="word" data-i="44">قُرْبَى.</span></p><p><span class="word" data-i="45">نُورَةُ:</span> <span class="word" data-i="46">وَمَا</span> <span class="word" data-i="47">مَعْنَى</span> <span class="word" data-i="48">صِلَةِ</span> <span class="word" data-i="49">الرَّحِمِ؟</span></p><p><span class="word" data-i="50">الْأَبُ:</span> <span class="word" data-i="51">صِلَةُ</span> <span class="word" data-i="52">الرَّحِمِ</span> <span class="word" data-i="53">تَعْنِي</span> <span class="word" data-i="54">زِيَارَةَ</span> <span class="word" data-i="55">الْأَقَارِبِ،</span> <span class="word" data-i="56">وَالسُّؤَالَ</span> <span class="word" data-i="57">عَنْهُمْ،</span> <span class="word" data-i="58">وَتَفَقُّدَ</span> <span class="word" data-i="59">أَحْوَالِهِمْ،</span> <span class="word" data-i="60">وَمُسَاعَدَتَهُمْ</span> <span class="word" data-i="61">عِنْدَ</span> <span class="word" data-i="62">الْحَاجَةِ،</span> <span class="word" data-i="63">وَمُشَارَكَتَهُمْ</span> <span class="word" data-i="64">أَفْرَاحَهُمْ</span> <span class="word" data-i="65">وَأَحْزَانَهُمْ</span></p><p><span class="word" data-i="66">فَوَّازٌ:</span> <span class="word" data-i="67">مَا</span> <span class="word" data-i="68">رَأْيُكَ</span> <span class="word" data-i="69">يَا</span> <span class="word" data-i="70">أَبِي</span> <span class="word" data-i="71">أَنْ</span> <span class="word" data-i="72">نُخَصِّصَ</span> <span class="word" data-i="73">يَوْمًا</span> <span class="word" data-i="74">نَصِلُ</span> <span class="word" data-i="75">فِيهِ</span> <span class="word" data-i="76">أَرْحَامَنَا؟</span></p><div class="spacer"></div><p><span class="word" data-i="77">الْأَبُ:</span> <span class="word" data-i="78">إِنَّهُ</span> <span class="word" data-i="79">رَأْيٌ</span> <span class="word" data-i="80">جَمِيلٌ،</span> <span class="word" data-i="81">بَارَكَ</span> <span class="word" data-i="82">اللهُ</span> <span class="word" data-i="83">فِيكَ</span> <span class="word" data-i="84">يَا</span> <span class="word" data-i="85">بُنَيَّ</span></p><div class="spacer"></div><p><span class="word" data-i="86">نُورَةُ:</span> <span class="word" data-i="87">أَنَا</span> <span class="word" data-i="88">مُتَشَوِّقَةٌ</span> <span class="word" data-i="89">لِهَذَا</span> <span class="word" data-i="90">الْيَوْمِ</span> <span class="word" data-i="91">يَا</span> <span class="word" data-i="92">أَبِي.</span></p><div class="spacer"></div><p><span class="word" data-i="93">الْأَبُ:</span> <span class="word" data-i="94">بَارَكَ</span> <span class="word" data-i="95">اللهُ</span> <span class="word" data-i="96">فِيكِ</span> <span class="word" data-i="97">يَا</span> <span class="word" data-i="98">بُنَيَّتِي</span></p>
     </div>
-    <div class="small" style="margin-top:6px">
-      أثناء تشغيل الصوت اضغطي الزر مع بداية كل كلمة. على الكمبيوتر يمكن استخدام زر المسافة أيضًا.
-    </div>
+  </section>
+
+  <div class="status">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="time" id="time">0:00 / 1:56</div>
   </div>
 
-  <div class="row" style="margin-top:8px">
-    <input id="seek" type="range" min="0" max="116.1404" value="0" step="0.01">
-    <span id="timeLabel">00:00 / 01:56</span>
-  </div>
-
-  <div id="exportPanel" style="margin-top:12px;background:#f9f7fc;border:1px solid #e5deef;border-radius:16px;padding:12px">
-      <div style="font-weight:800;margin-bottom:6px">بيانات التزامن</div>
-      <div class="small" style="margin-bottom:8px">
-        بعد إنهاء ضبط جميع الكلمات ستظهر البيانات هنا تلقائيًا. اضغطي داخل المربع ثم اختاري «تحديد الكل» و«نسخ».
-      </div>
-      <textarea id="exportBox" readonly autocapitalize="off" autocomplete="off" spellcheck="false" style="width:100%;height:120px;border:1px solid #d9d2e5;border-radius:12px;padding:10px;direction:ltr;font-size:12px;background:white"></textarea>
-      <div class="row" style="margin-top:8px">
-        <button id="selectBtn">تحديد البيانات كلها</button>
-        <button id="downloadBtn" class="good">تنزيل ملف التزامن</button>
-      </div>
-    </div>
-</div>
-
-
-<div class="editor">
-  <div class="editorTitle">الضبط الدقيق للكلمات</div>
-  <div class="small">شغّلي الصوت، واختاري الكلمة التي تحتاج تعديلًا. استخدمي ±0.05 ثانية للتعديل الدقيق. زر «اختبار الكلمة» يبدأ قبلها بنصف ثانية.</div>
-  <div class="wordNav">
-    <div class="wordBox"><div class="small">السابقة</div><div id="prevWord">—</div></div>
-    <div class="wordBox current"><div class="small">الحالية</div><div id="editWord">—</div></div>
-    <div class="wordBox"><div class="small">التالية</div><div id="nextWord">—</div></div>
-  </div>
-  <div id="editIndex" class="indexLabel">—</div>
-  <div class="adjust">
-    <button id="prevEdit">◀ السابقة</button>
-    <button id="minus10">−0.10 ث</button>
-    <button id="minus05">−0.05 ث</button>
-    <button id="testWord" class="primary">▶ اختبار الكلمة</button>
-    <button id="plus05">+0.05 ث</button>
-    <button id="plus10">+0.10 ث</button>
-    <button id="nextEdit">التالية ▶</button>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <button id="saveFine" class="good">✓ حفظ التعديلات</button>
-    <button id="downloadFine">تنزيل التوقيت النهائي</button>
-    <span id="fineMsg" class="small"></span>
-  </div>
-</div>
-
-<audio id="audio" preload="auto" src="S.mp3"></audio>
-</div>
+  <audio class="audio" id="audio" preload="auto" src="S.mp3"></audio>
+</main>
 
 <script>
-const rough=[0.3939077819994369, 1.0108588043312983, 1.6105889573323828, 3.2272274239989955, 3.9440123476647866, 4.810606701666432, 5.977319665999959, 6.827899758331582, 8.994022206999915, 9.826732104332434, 10.178226506334662, 11.42788475133319, 12.097884751333185, 12.444649468998861, 13.561379464666299, 14.561040471666889, 15.87778059166668, 16.660388988001575, 17.227612544667988, 17.994405224002037, 20.21036287166552, 20.577652883667028, 21.143358990666975, 21.89468024500031, 22.7601384346686, 23.76090130266663, 25.161134565998236, 26.21072514899949, 27.57688731633214, 28.776849984665105, 29.960957745999853, 31.51007190299899, 32.34384011733465, 32.79364089299956, 33.74444951666586, 34.177553795333615, 36.227440203334424, 38.22777599900093, 39.47755843700248, 40.7434771713353, 40.8134771713353, 41.811027211665795, 43.04393891700144, 43.577280709663754, 44.46119520566595, 46.711183319999826, 48.8272848729991, 49.29406635166746, 50.026791180332694, 50.54406724500241, 52.21080540966573, 54.76062019033218, 55.57652092866647, 57.29345338099903, 58.677160087000225, 59.76116353733259, 62.478017085000175, 63.59404689133242, 65.96062000500223, 67.29426171633429, 69.87735719366758, 71.26106283766828, 72.46077518633325, 74.75720294766506, 76.67338571366749, 78.58852518766804, 81.06018040066742, 83.14320916166827, 83.52671589400182, 84.19671589400178, 84.51002759866833, 85.59365432533525, 86.07691231133518, 86.8767304196654, 88.02660135666767, 88.84345944066783, 89.47788171566694, 91.83615485666525, 93.70229622599979, 94.70241365866669, 95.43547942966798, 97.15141161700006, 97.86870826966923, 98.61854299533299, 99.18498311066814, 99.36911892833427, 101.22753235966636, 103.34432401733235, 103.97798674833471, 105.59388878400229, 106.2105639843346, 107.14398874499928, 107.62695231866583, 110.0773947666665, 112.09466525866661, 112.94368955133179, 113.7105971729987, 114.32771561099982, 114.82661896333197];
-const tokenText=["عِنْدَ", "عَوْدَةِ", "فَوَّازٍ", "وَنُورَةَ", "مِنَ", "الْمَدْرَسَةِ", "بِصُحْبَةِ", "أَبِيهِمَا،", "اسْتَمَعُوا", "إِلَى", "مُذِيعٍ", "يَقْرَأُ", "فِي", "الْإِذَاعَةِ", "قَوْلَ", "الرَّسُولِ", "-صَلَّى", "اللهُ", "عَلَيْهِ", "وَسَلَّمَ-:", "«مَنْ", "كَانَ", "يُؤْمِنُ", "بِاللهِ", "وَالْيَوْمِ", "الْآخِرِ", "فَلْيَصِلْ", "رَحِمَهُ»", "سَأَلَ", "فَوَّازٌ", "أَبَاهُ:", "مَا", "مَعْنَى", "الرَّحِمِ", "يَا", "أَبِي؟", "الْأَبُ:", "الرَّحِمُ", "اسْمٌ", "لِكُلِّ", "مَنْ", "تَرْبِطُنَا", "بِهِمْ", "صِلَةُ", "قُرْبَى.", "نُورَةُ:", "وَمَا", "مَعْنَى", "صِلَةِ", "الرَّحِمِ؟", "الْأَبُ:", "صِلَةُ", "الرَّحِمِ", "تَعْنِي", "زِيَارَةَ", "الْأَقَارِبِ،", "وَالسُّؤَالَ", "عَنْهُمْ،", "وَتَفَقُّدَ", "أَحْوَالِهِمْ،", "وَمُسَاعَدَتَهُمْ", "عِنْدَ", "الْحَاجَةِ،", "وَمُشَارَكَتَهُمْ", "أَفْرَاحَهُمْ", "وَأَحْزَانَهُمْ", "فَوَّازٌ:", "مَا", "رَأْيُكَ", "يَا", "أَبِي", "أَنْ", "نُخَصِّصَ", "يَوْمًا", "نَصِلُ", "فِيهِ", "أَرْحَامَنَا؟", "الْأَبُ:", "إِنَّهُ", "رَأْيٌ", "جَمِيلٌ،", "بَارَكَ", "اللهُ", "فِيكَ", "يَا", "بُنَيَّ", "نُورَةُ:", "أَنَا", "مُتَشَوِّقَةٌ", "لِهَذَا", "الْيَوْمِ", "يَا", "أَبِي.", "الْأَبُ:", "بَارَكَ", "اللهُ", "فِيكِ", "يَا", "بُنَيَّتِي"];
-const audio=document.getElementById('audio');
-const words=[...document.querySelectorAll('.word')];
-const playBtn=document.getElementById('playBtn'), restartBtn=document.getElementById('restartBtn');
-const calBtn=document.getElementById('calBtn'), calArea=document.getElementById('calArea');
-const tapBtn=document.getElementById('tapBtn'), undoBtn=document.getElementById('undoBtn'), finishBtn=document.getElementById('finishBtn');
-const targetWord=document.getElementById('targetWord'), status=document.getElementById('status');
-const seek=document.getElementById('seek'), timeLabel=document.getElementById('timeLabel');
-const exportBox=document.getElementById('exportBox'), selectBtn=document.getElementById('selectBtn'), downloadBtn=document.getElementById('downloadBtn');
+const starts = [0.3939077819994369, 1.0108588043312983, 1.6105889573323828, 3.2272274239989955, 3.9440123476647866, 4.810606701666432, 5.977319665999959, 6.827899758331582, 8.994022206999915, 9.826732104332434, 10.178226506334662, 11.42788475133319, 12.097884751333185, 12.444649468998861, 13.561379464666299, 14.561040471666889, 15.87778059166668, 16.660388988001575, 17.227612544667988, 17.994405224002037, 20.21036287166552, 20.577652883667028, 21.143358990666975, 21.89468024500031, 22.7601384346686, 23.76090130266663, 25.161134565998236, 26.21072514899949, 27.57688731633214, 28.776849984665105, 29.960957745999853, 31.51007190299899, 32.34384011733465, 32.79364089299956, 33.74444951666586, 34.177553795333615, 36.227440203334424, 38.22777599900093, 39.47755843700248, 40.7434771713353, 40.8134771713353, 41.811027211665795, 43.04393891700144, 43.577280709663754, 44.46119520566595, 46.711183319999826, 48.8272848729991, 49.29406635166746, 50.026791180332694, 50.54406724500241, 52.21080540966573, 54.76062019033218, 55.57652092866647, 57.29345338099903, 58.677160087000225, 59.76116353733259, 62.478017085000175, 63.59404689133242, 65.96062000500223, 67.29426171633429, 69.87735719366758, 71.26106283766828, 72.46077518633325, 74.75720294766506, 76.67338571366749, 78.58852518766804, 81.06018040066742, 83.14320916166827, 83.52671589400182, 84.19671589400178, 84.51002759866833, 85.59365432533525, 86.07691231133518, 86.8767304196654, 88.02660135666767, 88.84345944066783, 89.47788171566694, 91.83615485666525, 93.70229622599979, 94.70241365866669, 95.43547942966798, 97.15141161700006, 97.86870826966923, 98.61854299533299, 99.18498311066814, 99.36911892833427, 101.22753235966636, 103.34432401733235, 103.97798674833471, 105.59388878400229, 106.2105639843346, 107.14398874499928, 107.62695231866583, 110.0773947666665, 112.09466525866661, 112.94368955133179, 113.7105971729987, 114.32771561099982, 114.82661896333197];
+const audio = document.getElementById('audio');
+const spans = [...document.querySelectorAll('.word')];
+const reader = document.getElementById('reader');
+const fill = document.getElementById('fill');
+const time = document.getElementById('time');
+let current = -1;
 
-let starts=rough.slice();
-let calibrated=true;
-let active=-1, calibrating=false, calIndex=0, captured=[];
-
-function fmt(s){s=Math.max(0,s||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function fmt(sec){
+  sec = Math.max(0, Math.floor(sec || 0));
+  return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");
+}
 function setActive(i){
-  if(active===i)return;
-  if(active>=0&&words[active])words[active].classList.remove('active');
-  active=i;
-  if(i>=0&&words[i]){
-    words[i].classList.add('active');
-    const r=words[i].getBoundingClientRect();
-    if(r.top<40||r.bottom>window.innerHeight-150)words[i].scrollIntoView({behavior:'smooth',block:'center'});
+  if(i===current) return;
+  if(current>=0 && spans[current]) spans[current].classList.remove('active');
+  current=i;
+  if(current>=0 && spans[current]){
+    spans[current].classList.add('active');
+    const r=spans[current].getBoundingClientRect(), rr=reader.getBoundingClientRect();
+    if(r.top < rr.top+20 || r.bottom > rr.bottom-20){
+      spans[current].scrollIntoView({behavior:'smooth',block:'center'});
+    }
   }
 }
-function getIndex(t){
-  let lo=0,hi=starts.length-1,ans=-1;
-  while(lo<=hi){let m=(lo+hi)>>1;if(starts[m]<=t){ans=m;lo=m+1}else hi=m-1}
+function indexForTime(t){
+  let lo=0, hi=starts.length-1, ans=-1;
+  while(lo<=hi){
+    const m=(lo+hi)>>1;
+    if(starts[m]<=t){ans=m;lo=m+1} else hi=m-1;
+  }
   return ans;
 }
 function update(){
-  if(!calibrating)setActive(getIndex(audio.currentTime));
-  seek.value=audio.currentTime;
-  timeLabel.textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration||116.14);
-  requestAnimationFrame(update);
+  const t=audio.currentTime||0;
+  setActive(indexForTime(t));
+  const dur=audio.duration||116.14;
+  fill.style.width=Math.min(100,(t/dur)*100)+"%";
+  time.textContent=fmt(t)+" / "+fmt(dur);
 }
-function refreshStatus(){
- status.textContent=calibrated?'التوقيت الحالي: مضبوط حسب التزامنك':'التوقيت الحالي: مبدئي — يحتاج ضبط';
- exportBox.value=JSON.stringify(starts);
-}
-playBtn.onclick=async()=>{if(audio.paused){await audio.play();playBtn.textContent='⏸ إيقاف'}else{audio.pause();playBtn.textContent='▶ متابعة'}};
-restartBtn.onclick=()=>{audio.currentTime=0;audio.play();playBtn.textContent='⏸ إيقاف'};
-seek.oninput=()=>audio.currentTime=parseFloat(seek.value);
+audio.addEventListener('timeupdate', update);
+audio.addEventListener('loadedmetadata', update);
+audio.addEventListener('ended', ()=>setActive(-1));
 
-function showTarget(){
-  words.forEach(w=>w.classList.remove('target'));
-  if(calIndex<words.length){
-    targetWord.textContent=tokenText[calIndex];
-    words[calIndex].classList.add('target');
-    words[calIndex].scrollIntoView({behavior:'smooth',block:'center'});
-  } else {
-    targetWord.textContent='اكتمل ✓';
-  }
-}
-calBtn.onclick=async()=>{
- calibrating=true; calArea.classList.remove('hidden'); captured=[]; calIndex=0;
- audio.currentTime=0; await audio.play(); playBtn.textContent='⏸ إيقاف';
- showTarget();
-};
-function tap(){
- if(!calibrating||calIndex>=words.length)return;
- captured[calIndex]=Math.max(0,audio.currentTime-0.05);
- calIndex++;
- showTarget();
- if(calIndex>=words.length){audio.pause();finishCalibration();}
-}
-tapBtn.onclick=tap;
-document.addEventListener('keydown',e=>{if(calibrating&&e.code==='Space'){e.preventDefault();tap();}});
-undoBtn.onclick=()=>{
- if(!calibrating||calIndex<=0)return;
- calIndex--; captured= captured.slice(0,calIndex); audio.currentTime=Math.max(0,(captured[calIndex-1]||0)); showTarget();
-};
-function finishCalibration(){
- if(captured.length<words.length) return;
- starts=captured.slice();
- localStorage.setItem('silat_sync_starts',JSON.stringify(starts));
- localStorage.setItem('silat_sync_done','1');
- calibrated=true; calibrating=false; calArea.classList.add('hidden');
- words.forEach(w=>w.classList.remove('target')); refreshStatus(); audio.currentTime=0; setActive(-1); document.getElementById('exportPanel').scrollIntoView({behavior:'smooth',block:'center'});
-}
-finishBtn.onclick=finishCalibration;
+document.getElementById('playBtn').addEventListener('click', async()=>{try{await audio.play()}catch(e){}});
+document.getElementById('pauseBtn').addEventListener('click', ()=>audio.pause());
+document.getElementById('restartBtn').addEventListener('click', async()=>{
+  audio.pause(); audio.currentTime=0; setActive(-1); update();
+  try{await audio.play()}catch(e){}
+});
 
-selectBtn.onclick=()=>{
-  exportBox.focus();
-  exportBox.select();
-  exportBox.setSelectionRange(0, exportBox.value.length);
-};
-downloadBtn.onclick=()=>{
-  const blob=new Blob([exportBox.value],{type:'application/json;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='silat_sync.json';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
-};
-
-
-let editI=0;
-const prevWord=document.getElementById('prevWord'), editWord=document.getElementById('editWord'),
-      nextWord=document.getElementById('nextWord'), editIndex=document.getElementById('editIndex'),
-      fineMsg=document.getElementById('fineMsg');
-
-function showEditor(){
-  prevWord.textContent=editI>0?tokenText[editI-1]:'—';
-  editWord.textContent=tokenText[editI]||'—';
-  nextWord.textContent=editI<tokenText.length-1?tokenText[editI+1]:'—';
-  editIndex.textContent='الكلمة '+(editI+1)+' من '+tokenText.length+' — التوقيت: '+starts[editI].toFixed(3)+' ث';
-  words.forEach(w=>w.classList.remove('target'));
-  if(words[editI]) words[editI].classList.add('target');
-}
-function nudge(delta){
-  let v=starts[editI]+delta;
-  const min=editI>0?starts[editI-1]+0.02:0;
-  const max=editI<starts.length-1?starts[editI+1]-0.02:(audio.duration||116.14);
-  starts[editI]=Math.min(max,Math.max(min,v));
-  exportBox.value=JSON.stringify(starts);
-  showEditor();
-}
-document.getElementById('prevEdit').onclick=()=>{if(editI>0){editI--;showEditor();}};
-document.getElementById('nextEdit').onclick=()=>{if(editI<tokenText.length-1){editI++;showEditor();}};
-document.getElementById('minus10').onclick=()=>nudge(-0.10);
-document.getElementById('minus05').onclick=()=>nudge(-0.05);
-document.getElementById('plus05').onclick=()=>nudge(0.05);
-document.getElementById('plus10').onclick=()=>nudge(0.10);
-document.getElementById('testWord').onclick=async()=>{
-  audio.currentTime=Math.max(0,starts[editI]-0.55);
-  await audio.play();
-  playBtn.textContent='⏸ إيقاف';
-  setTimeout(()=>audio.pause(),1700);
-};
-words.forEach((w,i)=>w.addEventListener('dblclick',()=>{editI=i;showEditor();}));
-document.getElementById('saveFine').onclick=()=>{
-  localStorage.setItem('silat_sync_starts',JSON.stringify(starts));
-  localStorage.setItem('silat_sync_done','1');
-  fineMsg.textContent='تم الحفظ ✓';
-  exportBox.value=JSON.stringify(starts);
-};
-document.getElementById('downloadFine').onclick=()=>{
-  const blob=new Blob([JSON.stringify(starts)],{type:'application/json;charset=utf-8'});
-  const url=URL.createObjectURL(blob), a=document.createElement('a');
-  a.href=url;a.download='silat_sync_final.json';document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1000);
-};
-showEditor();
-
-refreshStatus();requestAnimationFrame(update);
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault(); audio.paused?audio.play():audio.pause()}
+});
+update();
 </script>
 </body>
 </html>
