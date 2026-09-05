@@ -28,6 +28,16 @@ input[type=range]{flex:1;min-width:220px}
 textarea{width:100%;height:85px;margin-top:10px;border:1px solid #ddd;border-radius:12px;padding:10px;direction:ltr;font-size:12px}
 .hidden{display:none}
 @media(max-width:700px){.panel{padding:16px 12px}.text{font-size:21px}#tapBtn{width:100%}}
+
+.editor{margin-top:12px;background:#fff;border:2px solid #d9cbea;border-radius:20px;padding:14px}
+.editorTitle{font-weight:800;font-size:18px;margin-bottom:8px}
+.wordNav{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;align-items:center;margin:10px 0}
+.wordBox{padding:10px;border-radius:12px;background:#f6f2fa;text-align:center}
+.wordBox.current{background:#fff0d2;font-size:22px;font-weight:900}
+.adjust{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.adjust button{min-width:88px}
+.indexLabel{text-align:center;font-weight:700;margin:6px}
+
 </style>
 </head>
 <body>
@@ -73,6 +83,32 @@ textarea{width:100%;height:85px;margin-top:10px;border:1px solid #ddd;border-rad
         <button id="downloadBtn" class="good">تنزيل ملف التزامن</button>
       </div>
     </div>
+</div>
+
+
+<div class="editor">
+  <div class="editorTitle">الضبط الدقيق للكلمات</div>
+  <div class="small">شغّلي الصوت، واختاري الكلمة التي تحتاج تعديلًا. استخدمي ±0.05 ثانية للتعديل الدقيق. زر «اختبار الكلمة» يبدأ قبلها بنصف ثانية.</div>
+  <div class="wordNav">
+    <div class="wordBox"><div class="small">السابقة</div><div id="prevWord">—</div></div>
+    <div class="wordBox current"><div class="small">الحالية</div><div id="editWord">—</div></div>
+    <div class="wordBox"><div class="small">التالية</div><div id="nextWord">—</div></div>
+  </div>
+  <div id="editIndex" class="indexLabel">—</div>
+  <div class="adjust">
+    <button id="prevEdit">◀ السابقة</button>
+    <button id="minus10">−0.10 ث</button>
+    <button id="minus05">−0.05 ث</button>
+    <button id="testWord" class="primary">▶ اختبار الكلمة</button>
+    <button id="plus05">+0.05 ث</button>
+    <button id="plus10">+0.10 ث</button>
+    <button id="nextEdit">التالية ▶</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button id="saveFine" class="good">✓ حفظ التعديلات</button>
+    <button id="downloadFine">تنزيل التوقيت النهائي</button>
+    <span id="fineMsg" class="small"></span>
+  </div>
 </div>
 
 <audio id="audio" preload="auto" src="S.mp3"></audio>
@@ -177,6 +213,55 @@ downloadBtn.onclick=()=>{
   a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
 };
+
+
+let editI=0;
+const prevWord=document.getElementById('prevWord'), editWord=document.getElementById('editWord'),
+      nextWord=document.getElementById('nextWord'), editIndex=document.getElementById('editIndex'),
+      fineMsg=document.getElementById('fineMsg');
+
+function showEditor(){
+  prevWord.textContent=editI>0?tokenText[editI-1]:'—';
+  editWord.textContent=tokenText[editI]||'—';
+  nextWord.textContent=editI<tokenText.length-1?tokenText[editI+1]:'—';
+  editIndex.textContent='الكلمة '+(editI+1)+' من '+tokenText.length+' — التوقيت: '+starts[editI].toFixed(3)+' ث';
+  words.forEach(w=>w.classList.remove('target'));
+  if(words[editI]) words[editI].classList.add('target');
+}
+function nudge(delta){
+  let v=starts[editI]+delta;
+  const min=editI>0?starts[editI-1]+0.02:0;
+  const max=editI<starts.length-1?starts[editI+1]-0.02:(audio.duration||116.14);
+  starts[editI]=Math.min(max,Math.max(min,v));
+  exportBox.value=JSON.stringify(starts);
+  showEditor();
+}
+document.getElementById('prevEdit').onclick=()=>{if(editI>0){editI--;showEditor();}};
+document.getElementById('nextEdit').onclick=()=>{if(editI<tokenText.length-1){editI++;showEditor();}};
+document.getElementById('minus10').onclick=()=>nudge(-0.10);
+document.getElementById('minus05').onclick=()=>nudge(-0.05);
+document.getElementById('plus05').onclick=()=>nudge(0.05);
+document.getElementById('plus10').onclick=()=>nudge(0.10);
+document.getElementById('testWord').onclick=async()=>{
+  audio.currentTime=Math.max(0,starts[editI]-0.55);
+  await audio.play();
+  playBtn.textContent='⏸ إيقاف';
+  setTimeout(()=>audio.pause(),1700);
+};
+words.forEach((w,i)=>w.addEventListener('dblclick',()=>{editI=i;showEditor();}));
+document.getElementById('saveFine').onclick=()=>{
+  localStorage.setItem('silat_sync_starts',JSON.stringify(starts));
+  localStorage.setItem('silat_sync_done','1');
+  fineMsg.textContent='تم الحفظ ✓';
+  exportBox.value=JSON.stringify(starts);
+};
+document.getElementById('downloadFine').onclick=()=>{
+  const blob=new Blob([JSON.stringify(starts)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url;a.download='silat_sync_final.json';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1000);
+};
+showEditor();
 
 refreshStatus();requestAnimationFrame(update);
 </script>
